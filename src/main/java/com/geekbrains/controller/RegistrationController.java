@@ -21,9 +21,13 @@ public class RegistrationController {
     private static final String VIEW = "registration";
     private static final String REDIRECTION = "/login" ;
     private static final String ATTRIBUTE = "message";
+    private static final String ERROR_MESSAGE = "User exists!";
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping(REGISTRATION_MAPPING)
     public String registration() {
@@ -34,19 +38,13 @@ public class RegistrationController {
     public String save(@RequestParam String username, String password, Model model) {
         User user = new User();
         String result = null;
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        password = encoder.encode(password);
-
-
-        System.out.println("yes!");
+        password = passwordEncoder.encode(password);
 
         User userFromDB = userService.getByUsername(username);
         if (userFromDB != null) {
-            System.out.println("yes!if!");
-            model.addAttribute(ATTRIBUTE, "User exists!");
+            model.addAttribute(ATTRIBUTE, ERROR_MESSAGE);
             result = REGISTRATION_MAPPING;
         } else {
-            System.out.println("yes!else!");
             user.setUsername(username);
             user.setPassword(password);
             user.setActive(true);
